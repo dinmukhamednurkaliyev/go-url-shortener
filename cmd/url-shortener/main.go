@@ -2,6 +2,8 @@ package main
 
 import (
 	"go-url-shortener/internal/config"
+	"go-url-shortener/internal/library/logger/sl"
+	"go-url-shortener/internal/storage/sqlite"
 	"log/slog"
 	"os"
 )
@@ -13,14 +15,18 @@ const (
 
 func main() {
 	cfg := config.MustLoad()
-	log := setupLogger(cfg.Env)
+	log := setupLogger(cfg.Env)		
 	
 	log.Info("Starting URL Shortener", slog.String("env", cfg.Env))
 	log.Debug("Debug mode enabled")
 
-	// TODO: init config: cleanenv
-	// TODO: init logger: slog
-	// TODO: init storage: sqlite
+	storage, err := sqlite.New(cfg.StoragePath)
+	if err != nil {
+		log.Error("Failed to initialize storage", sl.Error(err))
+		os.Exit(1)
+	}
+
+	_ = storage 
 	// TODO: init router: chi,
 	// TODO: run server
 }
